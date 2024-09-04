@@ -207,14 +207,28 @@ void nam::Conv1D::set_size_and_weights_(const int in_channels, const int out_cha
 void nam::Conv1D::process_(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const long i_start, const long ncols,
                            const long j_start) const
 {
+  // spiritually const, but not actually. We modify temporaries. A harmless white lie.
+  Conv1D *pThis = const_cast<Conv1D*>(this);
+
   // This is the clever part ;)
   for (size_t k = 0; k < this->_weight.size(); k++)
   {
     const long offset = this->_dilation * (k + 1 - this->_weight.size());
     if (k == 0)
-      output.middleCols(j_start, ncols) = this->_weight[k] * input.middleCols(i_start + offset, ncols);
+    {
+      // output.middleCols(j_start, ncols)  = this->_weight[k] * input.middleCols(i_start + offset, ncols); 
+      // (no temporaries)
+      pThis->_tmpMul.noalias() = this->_weight[k] * input.middleCols(i_start + offset, ncols);
+      output.middleCols(j_start, ncols) = pThis->_tmpMul;
+    }
     else
-      output.middleCols(j_start, ncols) += this->_weight[k] * input.middleCols(i_start + offset, ncols);
+    {
+      //output.middleCols(j_start, ncols) += this->_weight[k] * input.middleCols(i_start + offset, ncols);
+      // (no temporaries) 
+      
+      pThis->_tmpMul.noalias() = this->_weight[k] * input.middleCols(i_start + offset, ncols);
+      output.middleCols(j_start, ncols) += pThis->_tmpMul;
+    }
   }
   if (this->_bias.size() > 0)
     output.middleCols(j_start, ncols).colwise() += this->_bias;

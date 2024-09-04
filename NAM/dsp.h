@@ -162,9 +162,8 @@ public:
 
   long get_out_channels() const { return this->_weight.rows(); };
 
-private:
   Eigen::MatrixXf process(const Eigen::MatrixXf& input) const;// yyy remove me
-
+private:
   Eigen::MatrixXf _tmpMul;
   Eigen::MatrixXf _weight;
   Eigen::VectorXf _bias;
