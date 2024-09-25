@@ -58,12 +58,7 @@ void nam::wavenet::_Layer::process_(const Eigen::MatrixXf& input, const Eigen::M
   }
 
   head_input += this->_z.topRows(channels);
-
-  // output.middleCols(j_start, ncols) = input.middleCols(i_start, ncols) + this->_1x1.process(this->_z.topRows(channels));
-  // (without using temporaries)
-  this->_tmpTopRows =  this->_z.topRows(channels);
-  this->_1x1.process(_tmpTopRows,_tmpConv1x1);
-  output.middleCols(j_start, ncols) = input.middleCols(i_start, ncols) + _tmpConv1x1;
+  output.middleCols(j_start, ncols) = input.middleCols(i_start, ncols) + this->_1x1.process(this->_z.topRows(channels));
 }
 
 void nam::wavenet::_Layer::set_num_frames_(const long num_frames)
@@ -123,12 +118,10 @@ void nam::wavenet::_LayerArray::prepare_for_frames_(const long num_frames)
 }
 
 void nam::wavenet::_LayerArray::process_(const Eigen::MatrixXf& layer_inputs, const Eigen::MatrixXf& condition,
-                                    Eigen::MatrixXf& head_inputs, Eigen::MatrixXf& layer_outputs,
-                                    Eigen::MatrixXf& head_outputs)
+                                         Eigen::MatrixXf& head_inputs, Eigen::MatrixXf& layer_outputs,
+                                         Eigen::MatrixXf& head_outputs)
 {
-
-  this->_rechannel.process(layer_inputs,_tmpConv1x1Process);
-  _layer_buffers[0].middleCols(this->_buffer_start, layer_inputs.cols()) = _tmpConv1x1Process;
+  this->_layer_buffers[0].middleCols(this->_buffer_start, layer_inputs.cols()) = this->_rechannel.process(layer_inputs);
   const size_t last_layer = this->_layers.size() - 1;
   for (size_t i = 0; i < this->_layers.size(); i++)
   {
@@ -136,8 +129,7 @@ void nam::wavenet::_LayerArray::process_(const Eigen::MatrixXf& layer_inputs, co
                               i == last_layer ? layer_outputs : this->_layer_buffers[i + 1], this->_buffer_start,
                               i == last_layer ? 0 : this->_buffer_start);
   }
-  this->_head_rechannel.process(head_inputs,_tmpHeadProcess);
-  head_outputs = _tmpHeadProcess;
+  head_outputs = this->_head_rechannel.process(head_inputs);
 }
 
 void nam::wavenet::_LayerArray::set_num_frames_(const long num_frames)
