@@ -37,7 +37,7 @@ if (MSVC)
 	)
 else()
 	target_compile_options(render PRIVATE
-		-Wall -Wextra -Wpedantic -Wstrict-aliasing -Wunreachable-code -Weffc++ -Wno-unused-parameter
+		-Wall -Wextra -Wpedantic -Wstrict-aliasing -Wunreachable-code -Wno-unused-parameter
 		"$<$<CONFIG:DEBUG>:-Og;-ggdb;-Werror>"
 		"$<$<CONFIG:RELEASE>:-Ofast>"
 	)
@@ -82,7 +82,7 @@ if (MSVC)
 	)
 else()
 	target_compile_options(${TOOLS} PRIVATE
-		-Wall -Wextra -Wpedantic -Wstrict-aliasing -Wunreachable-code -Weffc++ -Wno-unused-parameter
+		-Wall -Wextra -Wpedantic -Wstrict-aliasing -Wunreachable-code -Wno-unused-parameter
 		"$<$<CONFIG:DEBUG>:-Og;-ggdb;-Werror>"
 		"$<$<CONFIG:RELEASE>:-Ofast>"
 	)
