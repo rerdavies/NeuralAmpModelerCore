@@ -98,7 +98,6 @@ void nam::DSP::Reset(const double sampleRate, const int maxBufferSize)
   mHaveExternalSampleRate = true;
   SetMaxBufferSize(maxBufferSize);
 
-  prewarm();
 }
 
 void nam::DSP::SetLoudness(const double loudness)
